@@ -31,8 +31,8 @@ For your code submission, it's preferred that you send us a link to a GIT reposi
 
 
 
-the code
+* the code
 
-a complete README on how to run the code, including any environment variables
+* a complete README on how to run the code, including any environment variables
 
-the SQL schema for your database
+* the SQL schema for your database
