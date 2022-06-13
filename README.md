@@ -7,7 +7,7 @@ Thanks for your interest in joining the Thrive Dev team. In order for us to bett
 
 
 
-The challenge
+**The challenge**
 
 Create a blogging platform API capable of managing blog posts, blog authors, and blog comments. Handling user authorization is not a requirement, but a plus. No front-end is required.
 
@@ -15,15 +15,15 @@ Create a blogging platform API capable of managing blog posts, blog authors, and
 
 You must use:
 
-node.js
+* node.js
 
-Typescript,
+* Typescript,
 
-a graphQL server,
+* a graphQL server,
 
-an RDBM system (mysql, postgreSQL, or MSSQL are all ok)
+* an RDBM system (mysql, postgreSQL, or MSSQL are all ok)
 
-The rest of your implementation is down to you (libraries, frameworks, etc)
+* The rest of your implementation is down to you (libraries, frameworks, etc)
 
 
 
