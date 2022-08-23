@@ -7,43 +7,46 @@ Thanks for your interest in joining the Thrive Dev team. In order for us to bett
 
 
 
-**The challenge**
+## The challenge
 
 You are building out a payment API for an e-commerce platform. You're working on the user story "As a user, I can submit my order and payment details to the system, in order to complete my purchase".
 
 
-**The acceptance criteria are:**
+## The acceptance criteria are:
 
 Functional requirements
 
-*Provide the order items including itemId, quantity*
+- Provide the order items including itemId, quantity
 
-*Provide payment details: cardNo, expiryDate, CVC no*
+- Provide payment details: cardNo, expiryDate, CVC no
 
-*Non-functional requirements*
+- Non-functional requirements
 
-*API request must be validated (no need to validate payment details for this challenge!)*
+- API request must be validated (*no need to validate payment details for this challenge!*)
 
-*ItemIds exist*
+- ItemIds exist
 
-*Items are in stock*
+- Items are in stock
 
-*Calls to API must be idempotent*
+- Calls to API must be idempotent
 
-You must use:
+You *must* use:
 
-*Typescript in node.js OR a statically-typed language*
+- Typescript in node.js OR a statically-typed language
 
-*REST or graphQL as the API layer*
+- REST or graphQL as the API layer
 
-*a persistence layer*
+- a persistence layer
 
-*The rest of your implementation is down to you (libraries, frameworks, etc)*
+- The rest of your implementation is down to you (libraries, frameworks, etc)- 
 
 **For your code submission, it's preferred that you send us a link to a GIT repository showing your personal commits, rather than a zip file, but a ZIP is acceptable. Your submission should include:**
 
-*the code
+- the code
 
-*a complete README on how to run the code, including any environment variables
+- a complete README on how to run the code, including any environment variables
 
-*if you use an RDBM persistence layer , provide the SQL schema as a SQL file
+- if you use an RDBM persistence layer , provide the SQL schema as a SQL file
+
+
+Thank you! Happy coding :)
