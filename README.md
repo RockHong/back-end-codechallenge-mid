@@ -9,30 +9,41 @@ Thanks for your interest in joining the Thrive Dev team. In order for us to bett
 
 **The challenge**
 
-Create a blogging platform API capable of managing blog posts, blog authors, and blog comments. Handling user authorization is not a requirement, but a plus. No front-end is required.
+You are building out a payment API for an e-commerce platform. You're working on the user story "As a user, I can submit my order and payment details to the system, in order to complete my purchase".
 
 
+**The acceptance criteria are:
+
+Functional requirements
+
+*Provide the order items including itemId, quantity
+
+*Provide payment details: cardNo, expiryDate, CVC no
+
+*Non-functional requirements
+
+*API request must be validated (no need to validate payment details for this challenge!)
+
+*ItemIds exist
+
+*Items are in stock
+
+*Calls to API must be idempotent
 
 You must use:
 
-* node.js
+*Typescript in node.js OR a statically-typed language
 
-* Typescript,
+*REST or graphQL as the API layer
 
-* a graphQL server,
+a persistence layer
 
-* an RDBM system (mysql, postgreSQL, or MSSQL are all ok)
-
-* The rest of your implementation is down to you (libraries, frameworks, etc)
-
-
+The rest of your implementation is down to you (libraries, frameworks, etc)
 
 For your code submission, it's preferred that you send us a link to a GIT repository showing your personal commits, rather than a zip file, but a ZIP is acceptable. Your submission should include:
 
+*the code
 
+*a complete README on how to run the code, including any environment variables
 
-* the code
-
-* a complete README on how to run the code, including any environment variables
-
-* the SQL schema for your database
+*if you use an RDBM persistence layer , provide the SQL schema as a SQL file
