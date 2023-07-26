@@ -18,9 +18,9 @@ You are building out an ordering API for an e-commerce platform. You're working 
     - Items added to cart must be in stock
 
 - Place an order by providing payment details: cardNo, expiryDate, CVC no, and cartNumber. 
-    - Items in cart stock at time of order
+    - Items in cart must be in stock at time of order
     - Cart instance should be converted to an order
-        - Order should now have itemized prices no longer linked to the current prices of the items
+        - Order should now have itemized static prices equal to price at time of order
         - Total reflects the cost of items at time of order
     - Returning order number and order status, and total charge. 
 
