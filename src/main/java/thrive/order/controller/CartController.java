@@ -3,6 +3,8 @@ package thrive.order.controller;
 import org.springframework.web.bind.annotation.*;
 import thrive.order.model.Cart;
 import thrive.order.model.CartItem;
+import thrive.order.model.Order;
+import thrive.order.model.PlaceOrder;
 import thrive.order.service.CartService;
 
 @RestController
@@ -35,5 +37,10 @@ public class CartController {
     @DeleteMapping("/cart/{userId}/items")
     Cart clearCart(@PathVariable Long userId) {
         return cartService.clearItems(userId);
+    }
+
+    @PostMapping("/cart/{userId}/placeOrder")
+    Order placeOrder(@PathVariable Long userId, @RequestBody PlaceOrder placeOrder) {
+        return cartService.placeOrder(userId, placeOrder);
     }
 }

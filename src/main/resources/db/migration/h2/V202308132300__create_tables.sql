@@ -30,16 +30,43 @@ CREATE TABLE CART_ITEM (
 );
 CREATE INDEX IDX_CART_ITM_CID ON CART_ITEM(cart_Id);
 
+CREATE TABLE SALES_ORDER (
+   id BIGINT PRIMARY KEY AUTO_INCREMENT,
+   account_id INT NOT NULL,
+   total NUMERIC(15, 2) NOT NULL,
+   payment_method_id INT,
+   status TINYINT
+);
+CREATE INDEX IDX_ORD_UID ON SALES_ORDER(account_id);
+
+CREATE TABLE ORDER_LINE_ITEM (
+   id BIGINT PRIMARY KEY AUTO_INCREMENT,
+   order_id INT NOT NULL,
+   product_id INT NOT NULL,
+   quantity INT NOT NULL,
+   price NUMERIC(12, 2) NOT NULL
+);
+CREATE INDEX IDX_ORD_LINE_OID ON ORDER_LINE_ITEM(order_id);
+
+CREATE TABLE PAYMENT_METHOD (
+   id BIGINT PRIMARY KEY AUTO_INCREMENT,
+   account_id INT NOT NULL,
+   type TINYINT,
+   card_number VARCHAR(25),
+   cvc_number VARCHAR(5),
+   expiry_date DATE
+);
+CREATE INDEX IDX_PMT_UID ON SALES_ORDER(account_id);
 
 -- populate some data for test
 INSERT INTO Account (username) VALUES ('hong');
 INSERT INTO Account (username) VALUES ('hua');
 
 INSERT INTO Product (name, price) VALUES ('iphone 14', 999);
+INSERT INTO INVENTORY (product_id, quantity) VALUES (1, 30);
 INSERT INTO Product (name, price) VALUES ('iphone 13', 799);
+INSERT INTO INVENTORY (product_id, quantity) VALUES (2, 60);
 INSERT INTO Product (name, price) VALUES ('iphone 12', 599);
-
-
-
+INSERT INTO INVENTORY (product_id, quantity) VALUES (3, 90);
 
 

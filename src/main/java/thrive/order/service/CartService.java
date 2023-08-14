@@ -2,6 +2,8 @@ package thrive.order.service;
 
 import thrive.order.model.Cart;
 import thrive.order.model.CartItem;
+import thrive.order.model.Order;
+import thrive.order.model.PlaceOrder;
 
 public interface CartService {
     /**
@@ -23,4 +25,6 @@ public interface CartService {
     Cart updateItem(Long userId, Long cartItemId, CartItem item);
 
     Cart clearItems(Long userId);
+
+    Order placeOrder(Long userId, PlaceOrder placeOrder);
 }

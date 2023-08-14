@@ -3,15 +3,17 @@ package thrive.order.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import thrive.account.Account;
+import thrive.order.exception.ConflictException;
+import thrive.order.exception.NotEnoughStockException;
 import thrive.order.exception.ResourceNotFoundException;
-import thrive.order.repository.Product;
+import thrive.order.model.Order;
+import thrive.order.model.PlaceOrder;
+import thrive.order.repository.*;
 import thrive.order.model.CartItem;
-import thrive.order.repository.CartRepository;
 import thrive.order.model.Cart;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 // TODO txn-annotation Transactional
@@ -19,9 +21,22 @@ import java.util.List;
 @Service
 public class CartServiceImpl implements CartService{
     private CartRepository cartRepository;
+    private OrderRepository orderRepository;
 
-    public CartServiceImpl(CartRepository cartRepository) {
+    private InventoryService inventoryService;
+
+    private PaymentMethodRepository paymentMethodRepository;
+
+    public CartServiceImpl(
+            CartRepository cartRepository,
+            InventoryService inventoryService,
+            OrderRepository orderRepository,
+            PaymentMethodRepository paymentMethodRepository)
+    {
         this.cartRepository = cartRepository;
+        this.inventoryService = inventoryService;
+        this.orderRepository = orderRepository;
+        this.paymentMethodRepository = paymentMethodRepository;
     }
 
     @Override
@@ -51,6 +66,8 @@ public class CartServiceImpl implements CartService{
         itemEntity.setProduct(product);
         itemEntity.setQuantity(item.getQuantity());
 
+        checkInventory(item.getProductId(), item.getQuantity());
+
         return convert(cartRepository.save(cartEntity));
     }
 
@@ -67,14 +84,75 @@ public class CartServiceImpl implements CartService{
             throw new ResourceNotFoundException("Cart item not found");
         }
         itemEntity.setQuantity(item.getQuantity()); // now only update quantity is supported
+
+        checkInventory(item.getProductId(), item.getQuantity());
         return convert(cartRepository.save(cartEntity));
     }
 
     @Override
     public Cart clearItems(Long userId) {
         var cartEntity = getOrCreateCartEntity(userId);
-        cartEntity.setItems(Collections.emptyList());
-        return convert(cartRepository.save(cartEntity));
+
+        cartRepository.deleteCartItems(cartEntity.getId());
+
+//        cartEntity.setItems(Collections.emptyList());
+        return convert(getOrCreateCartEntity(userId));
+    }
+
+    @Override
+    public Order placeOrder(Long userId, PlaceOrder placeOrder) {
+        log.debug("request placeOrder={}", placeOrder);
+        var cartEntity = getOrCreateCartEntity(userId);
+        if (cartEntity.getItems().isEmpty()) {
+            log.error("No item in cart");
+            throw new ConflictException("No item in cart");
+        }
+
+        var cart = convert(cartEntity);
+
+        var orderEntity = new thrive.order.repository.Order();
+        for (var cartItem: cart.getItems()) {
+            var lineEntity = new thrive.order.repository.OrderLineItem();
+            lineEntity.setOrder(orderEntity);
+            var product = new Product();
+            product.setId(cartItem.getProductId());
+            lineEntity.setProduct(product);
+            lineEntity.setQuantity(cartItem.getQuantity());
+            lineEntity.setPrice(cartItem.getUnitPrice());
+            orderEntity.getLineItems().add(lineEntity);
+
+            inventoryService.reduceStockQuantity(cartItem.getProductId(), cartItem.getQuantity());
+        }
+
+        orderEntity.setAccount(cartEntity.getAccount());
+        orderEntity.setStatus(OrderStatus.PLACED);
+        orderEntity.setTotal(cart.getTotalPrice());
+        orderEntity.setPaymentMethod(getPaymentMethod(placeOrder, cartEntity.getAccount()));
+
+        this.clearItems(userId);
+
+        return convert(orderRepository.save(orderEntity));
+    }
+
+    private thrive.order.repository.PaymentMethod getPaymentMethod(PlaceOrder placeOrder, Account account) {
+        if (placeOrder.getPaymentMethod().getId() != null) {
+            var paymentMethod = paymentMethodRepository.findById(placeOrder.getPaymentMethod().getId())
+                    .orElseThrow(() -> {
+                        return new ResourceNotFoundException("Payment method not found");
+                    });
+            if (!paymentMethod.getAccount().getId().equals(account.getId())) {
+                throw new ConflictException("Payment method from another user!");
+            }
+        }
+
+        var paymentMethod = new thrive.order.repository.PaymentMethod();
+        paymentMethod.setAccount(account);
+        paymentMethod.setCardNumber(placeOrder.getPaymentMethod().getCardNumber());
+        paymentMethod.setCvcNumber(placeOrder.getPaymentMethod().getCvcNumber());
+        paymentMethod.setExpiryDate(placeOrder.getPaymentMethod().getExpiryDate());
+        paymentMethod.setType(PaymentMethodType.valueOf(placeOrder.getPaymentMethod().getType().name()));
+
+        return paymentMethod;
     }
 
     private thrive.order.repository.Cart getOrCreateCartEntity(Long userId) {
@@ -106,6 +184,14 @@ public class CartServiceImpl implements CartService{
         return cart;
     }
 
+    private Order convert(thrive.order.repository.Order entity) {
+        var order = new Order();
+        order.setId(entity.getId());
+        order.setTotal(entity.getTotal());
+        order.setStatus(entity.getStatus().name());
+        return order;
+    }
+
     private void calculatePrices(Cart cart) {
         BigDecimal total = BigDecimal.ZERO;
         for (var item: cart.getItems()) {
@@ -116,4 +202,12 @@ public class CartServiceImpl implements CartService{
         cart.setTotalPrice(total);
     }
 
+    private void checkInventory(Long productId, int quantity) {
+        var inStock = inventoryService.getStockQuantity(productId);
+        if (quantity > inStock) {
+            log.error("not enough product in stock. productId={}, requested={}, inStock={}",
+                    productId, quantity, inStock);
+            throw new NotEnoughStockException("Not enough stock of product " + productId);
+        }
+    }
 }
