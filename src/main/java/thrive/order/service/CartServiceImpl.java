@@ -3,6 +3,7 @@ package thrive.order.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import thrive.account.Account;
+import thrive.order.exception.ResourceNotFoundException;
 import thrive.order.repository.Product;
 import thrive.order.model.CartItem;
 import thrive.order.repository.CartRepository;
@@ -63,7 +64,7 @@ public class CartServiceImpl implements CartService{
             }
         }
         if (itemEntity == null) {
-            throw new RuntimeException("not found"); // todo 404 error
+            throw new ResourceNotFoundException("Cart item not found");
         }
         itemEntity.setQuantity(item.getQuantity()); // now only update quantity is supported
         return convert(cartRepository.save(cartEntity));
@@ -97,12 +98,22 @@ public class CartServiceImpl implements CartService{
             item.setProductName(i.getProduct().getName());
             item.setUnitPrice(i.getProduct().getPrice());
             item.setQuantity(i.getQuantity());
-            item.setTotalPrice(item.getUnitPrice().multiply(new BigDecimal(item.getQuantity())));
             items.add(item);
         }
         cart.setItems(items);
 
+        calculatePrices(cart);
         return cart;
+    }
+
+    private void calculatePrices(Cart cart) {
+        BigDecimal total = BigDecimal.ZERO;
+        for (var item: cart.getItems()) {
+            item.setTotalPrice(item.getUnitPrice().multiply(new BigDecimal(item.getQuantity())));
+            total = total.add(item.getTotalPrice());
+        }
+
+        cart.setTotalPrice(total);
     }
 
 }
