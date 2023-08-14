@@ -1,5 +1,52 @@
 
+How to Run
+========
+## Start the server
+- In a terminal, go to root directory of this project.
+- Type `./gradlew bootRun`
 
+## Test the REST API
+### Get cart
+    curl localhost:8001/cart/1
+
+### Add/update item to/in cart
+Add an item to the cart.
+
+    curl -X POST -H "Content-Type: application/json" \
+        -d '{"productId": 2, "quantity": "3"}' \
+        localhost:8001/cart/1/items
+
+Update the quantity of the item in the cart (using POST).
+
+    curl -X POST -H "Content-Type: application/json" \
+        -d '{"productId": 2, "quantity": "6"}' \
+        localhost:8001/cart/1/items
+
+Update the quantity of the item in the cart (using PUT).
+
+    curl -X PUT -H "Content-Type: application/json" \
+        -d '{"quantity": "66"}' \
+        localhost:8001/cart/1/items/1
+
+### Empty cart
+    curl -X DELETE -H "Content-Type: application/json" localhost:8001/cart/1/items
+
+### Place order
+    curl -X POST -H "Content-Type: application/json" \
+        -d '{"paymentMethod": {"cardNumber": "123", "type":"CREDIT_CARD"}}' \
+        localhost:8001/cart/1/placeOrder
+
+### Add non-existed product
+    curl -X POST -H "Content-Type: application/json" \
+        -d '{"productId": 22222, "quantity": "3"}' \
+        localhost:8001/cart/1/items
+
+## Connect the H2 database
+In a browser, open http://localhost:8001/h2-console .
+Check the `applicaton.properties` file for the credentials.
+
+Copy of original README.md
+==========
 ## Hey there! 👋
 
 
